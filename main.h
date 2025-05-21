@@ -8,8 +8,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "lib/camera/orbit.h"
-#include "lib/camera/fps.h"
+#include "src/camera/orbit.h"
+#include "src/camera/fps.h"
 
 using namespace std;
 

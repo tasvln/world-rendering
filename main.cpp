@@ -149,7 +149,7 @@ GLuint loadShader(const char *vertexPath, const char *fragPath)
 
 bool initGL()
 {
-  gridShaderProgram = loadShader("lib/shaders/infiniteGrid/vertex.glsl", "lib/shaders/infiniteGrid/frag.glsl");
+  gridShaderProgram = loadShader("src/shaders/infiniteGrid/vertex.glsl", "src/shaders/infiniteGrid/frag.glsl");
 
   glGenVertexArrays(1, &gridVAO);
   glGenBuffers(1, &gridVBO);
@@ -176,7 +176,7 @@ bool initGL()
 
 bool drawOriginDot()
 {
-  originDotShaderProgram = loadShader("lib/shaders/centerAnchor/vertex.glsl", "lib/shaders/centerAnchor/frag.glsl");
+  originDotShaderProgram = loadShader("src/shaders/centerAnchor/vertex.glsl", "src/shaders/centerAnchor/frag.glsl");
 
   float dotVertices[] = {
       0.0f, 0.0f, 0.0f};
