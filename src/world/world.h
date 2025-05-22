@@ -12,6 +12,23 @@ namespace wrd
   class World : public Model
   {
   public:
+    World(const string &filePath) : Model(filePath)
+    {
+      // Initialize the world with the given file path
+    }
+    ~World() override
+    {
+      // Clean up resources if needed
+    }
+    void draw() override
+    {
+      // Implement the draw logic for the world
+    }
+    void update(float deltaTime) override
+    {
+      // Implement the update logic for the world
+    }
+
   private:
   };
 }

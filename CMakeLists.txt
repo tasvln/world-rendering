@@ -7,6 +7,8 @@ project(WINDOW VERSION 1.0.0)
 
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
+find_package(glm CONFIG REQUIRED)
+find_package(assimp REQUIRED)
 
 # Variables storing SDL framework locations
 set(SDL
@@ -29,6 +31,8 @@ target_link_libraries(
   ${SDL_ttf}/Versions/A/SDL3_ttf
   OpenGL::GL
   GLEW::GLEW
+  assimp::assimp
+  glm::glm-header-only
 )
 
 target_include_directories(
