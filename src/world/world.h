@@ -10,7 +10,7 @@ namespace nsi
   class World : public Model
   {
   public:
-    World(const string &filePath) : Model(filePath)
+    World(const std::string &filePath) : Model(filePath)
     {
       // Initialize the world with the given file path
     }

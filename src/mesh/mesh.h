@@ -18,8 +18,8 @@ struct Vertex
 struct Texture
 {
   uint id;
-  string type;
-  string filePath;
+  std::string type;
+  std::string filePath;
 };
 
 namespace nsi
@@ -27,11 +27,11 @@ namespace nsi
   class Mesh
   {
   public:
-    vector<Vertex> vertices;
-    vector<uint> indices;
-    vector<Texture> textures;
+    std::vector<Vertex> vertices;
+    std::vector<uint> indices;
+    std::vector<Texture> textures;
 
-    Mesh(const vector<Vertex> &vertices, const vector<uint> &indices, const vector<Texture> &textures) : vertices(vertices), indices(indices), textures(textures)
+    Mesh(const std::vector<Vertex> &vertices, const std::vector<uint> &indices, const std::vector<Texture> &textures) : vertices(vertices), indices(indices), textures(textures)
     {
       setupMesh();
     }
@@ -94,8 +94,8 @@ namespace nsi
       {
         glActiveTexture(GL_TEXTURE0 + i);
 
-        string number;
-        string name = textures[i].type;
+        std::string number;
+        std::string name = textures[i].type;
 
         if (name == "texture_diffuse")
         {
@@ -114,7 +114,7 @@ namespace nsi
           number = to_string(heightNr++);
         }
 
-        string uniformName = name + number;
+        std::string uniformName = name + number;
         glUniform1i(glGetUniformLocation(shader.ID, uniformName.c_str()), i);
 
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
