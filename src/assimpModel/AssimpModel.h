@@ -7,9 +7,7 @@
 
 #include "../model/model.h"
 
-using namespace mdl;
-
-namespace aml
+namespace nsi
 {
   class AssimpModel : public Model
   {

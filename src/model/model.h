@@ -6,7 +6,7 @@
 
 using namespace std;
 
-namespace mdl
+namespace nsi
 {
   class Model
   {

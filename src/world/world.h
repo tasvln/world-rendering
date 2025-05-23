@@ -5,9 +5,7 @@
 
 #include "../model/model.h"
 
-using namespace mod;
-
-namespace wrd
+namespace nsi
 {
   class World : public Model
   {
