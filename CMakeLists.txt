@@ -21,7 +21,7 @@ set(SDL_ttf
 add_executable(WINDOW main.cpp)
 
 include_directories(
-  ${CMAKE_SOURCE_DIR}/src/include
+  ${CMAKE_SOURCE_DIR}/lib/include
 )
 
 target_link_libraries(

@@ -10,24 +10,13 @@ namespace nsi
   class World : public AssimpModel
   {
   public:
-    World(const std::string &filePath) : Model(filePath)
+    World(const std::string &filePath) : AssimpModel(filePath) {};
+    World(const std::string &filePath, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale) : AssimpModel(filePath, position, rotation, scale) {};
+    ~World() override = default;
+    void draw(GLuint shader) override
     {
-      // Initialize the world with the given file path
+      AssimpModel::draw(shader);
     }
-    ~World() override
-    {
-      // Clean up resources if needed
-    }
-    void draw() override
-    {
-      // Implement the draw logic for the world
-    }
-    void update(float deltaTime) override
-    {
-      // Implement the update logic for the world
-    }
-
-  private:
   };
 }
 

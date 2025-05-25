@@ -9,24 +9,23 @@
 #include <string>
 #include <vector>
 
-#include <stb/stb_image.h>
-
 #include "../model/model.h"
 #include "../mesh/mesh.h"
+#include "utils.h"
 
 namespace nsi
 {
   class AssimpModel : public Model
   {
   public:
-    AssimpModel(const string &filePath, glm::vec3 position = glm::vec3(0.0f), glm::vec3 rotation = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f)) : Model(filePath, position, rotation, scale)
+    AssimpModel(const std::string &filePath, glm::vec3 position = glm::vec3(0.0f), glm::vec3 rotation = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f)) : Model(filePath, position, rotation, scale)
     {
       loadModel(filePath);
     };
 
     ~AssimpModel() override = default;
 
-    void draw(Shader &shader) override
+    void draw(GLuint shader) override
     {
       for (Mesh &mesh : meshes)
       {
@@ -83,7 +82,7 @@ namespace nsi
 
       for (unsigned int i = 0; i < mesh->mNumVertices; i++)
       {
-        vec3 vector;
+        glm::vec3 vector;
 
         // positions
         vector.x = mesh->mVertices[i].x;
@@ -151,11 +150,11 @@ namespace nsi
       textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
       // 3. normal maps
-      std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+      std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal");
       textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
       // 4. height maps
-      std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+      std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_height");
       textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
       // return a mesh object created from the extracted mesh data
@@ -164,7 +163,7 @@ namespace nsi
 
     std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, const std::string typeName)
     {
-      vector<Texture> textures;
+      std::vector<Texture> textures;
 
       for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
       {
@@ -175,9 +174,9 @@ namespace nsi
 
         for (auto &texture : loadedTextures)
         {
-          if (texture.path == str.C_Str())
+          if (texture.second.filePath == str.C_Str())
           {
-            textures.push_back(texture);
+            textures.push_back(texture.second);
             check = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
             break;
           }
@@ -189,64 +188,16 @@ namespace nsi
           Texture texture;
           texture.id = textureFromFile(str.C_Str(), this->directory);
           texture.type = typeName;
-          texture.path = str.C_Str();
+          texture.filePath = str.C_Str();
           textures.push_back(texture);
-          loadedTextures.push_back(texture);
+          loadedTextures.insert({str.C_Str(), texture}); // store it as texture loaded
+          // in the textures map
         }
       }
 
       return textures;
     }
   };
-};
-
-uint textureFromFile(const char *path, const std::string &directory, bool gamma)
-{
-
-  std::string filename = string(path);
-  filename = directory + '/' + filename;
-
-  unsigned int textureId;
-  glGenTextures(1, &textureId);
-
-  int width, height, nrComponents;
-
-  unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
-
-  if (data)
-  {
-    GLenum format;
-    if (nrComponents == 1)
-    {
-      format = GL_RED;
-    }
-    else if (nrComponents == 3)
-    {
-      format = GL_RGB;
-    }
-    else if (nrComponents == 4)
-    {
-      format = GL_RGBA;
-    }
-
-    glBindTexture(GL_TEXTURE_2D, textureId);
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    stbi_image_free(data);
-  }
-  else
-  {
-    std::cout << "Texture failed to load at path: " << path << std::endl;
-    stbi_image_free(data);
-  }
-
-  return textureId;
 };
 
 #endif

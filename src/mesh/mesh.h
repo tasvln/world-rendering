@@ -12,7 +12,7 @@ struct Vertex
   glm::vec3 normal;
   glm::vec2 texCoords;
   glm::vec3 tangent;
-  glm::vec3 bitangent;
+  glm::vec3 biTangent;
 };
 
 struct Texture
@@ -41,6 +41,51 @@ namespace nsi
       glDeleteVertexArrays(1, &VAO);
       glDeleteBuffers(1, &VBO);
       glDeleteBuffers(1, &EBO);
+    }
+
+    void draw(GLuint shader)
+    {
+      uint diffuseNr = 1;
+      uint specularNr = 1;
+      uint normalNr = 1;
+      uint heightNr = 1;
+
+      for (uint i = 0; i < textures.size(); i++)
+      {
+        glActiveTexture(GL_TEXTURE0 + i);
+
+        std::string number;
+        std::string name = textures[i].type;
+
+        if (name == "texture_diffuse")
+        {
+          number = std::to_string(diffuseNr++);
+        }
+        else if (name == "texture_specular")
+        {
+          number = std::to_string(specularNr++);
+        }
+        else if (name == "texture_normal")
+        {
+          number = std::to_string(normalNr++);
+        }
+        else if (name == "texture_height")
+        {
+          number = std::to_string(heightNr++);
+        }
+
+        std::string uniformName = name + number;
+        glUniform1i(glGetUniformLocation(shader, uniformName.c_str()), i);
+
+        glBindTexture(GL_TEXTURE_2D, textures[i].id);
+      }
+
+      glBindVertexArray(VAO);
+      glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+      glBindVertexArray(0);
+
+      // reset to default
+      glActiveTexture(GL_TEXTURE0);
     }
 
   private:
@@ -78,54 +123,9 @@ namespace nsi
 
       // bitangent attribute
       glEnableVertexAttribArray(4);
-      glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)(offsetof(Vertex, bitangent)));
+      glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)(offsetof(Vertex, biTangent)));
 
       glBindVertexArray(0);
-    }
-
-    void draw(Shader &shader)
-    {
-      uint diffuseNr = 1;
-      uint specularNr = 1;
-      uint normalNr = 1;
-      uint heightNr = 1;
-
-      for (uint i = 0; i < textures.size(); i++)
-      {
-        glActiveTexture(GL_TEXTURE0 + i);
-
-        std::string number;
-        std::string name = textures[i].type;
-
-        if (name == "texture_diffuse")
-        {
-          number = to_string(diffuseNr++);
-        }
-        else if (name == "texture_specular")
-        {
-          number = to_string(specularNr++);
-        }
-        else if (name == "texture_normal")
-        {
-          number = to_string(normalNr++);
-        }
-        else if (name == "texture_height")
-        {
-          number = to_string(heightNr++);
-        }
-
-        std::string uniformName = name + number;
-        glUniform1i(glGetUniformLocation(shader.ID, uniformName.c_str()), i);
-
-        glBindTexture(GL_TEXTURE_2D, textures[i].id);
-      }
-
-      glBindVertexArray(VAO);
-      glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-      glBindVertexArray(0);
-
-      // reset to default
-      glActiveTexture(GL_TEXTURE0);
     }
   };
 }

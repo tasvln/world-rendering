@@ -4,6 +4,8 @@
 
 void close()
 {
+  if (worldModel)
+    delete worldModel;
   if (gridEBO)
     glDeleteBuffers(1, &gridEBO);
   if (gridVBO)
@@ -198,6 +200,14 @@ bool drawOriginDot()
   return true;
 }
 
+bool drawWorldModel()
+{
+  worldProgram = loadShader("src/shaders/worldModel/vertex.glsl", "src/shaders/worldModel/frag.glsl");
+  worldModel = new nsi::World("ext/models/mountain1/mesh_range01_05K_OBJ.obj", glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
+
+  return true;
+}
+
 void update()
 {
   // FPS Update logic
@@ -261,9 +271,9 @@ void render()
   glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glm::mat4 model = glm::mat4(1.0f);
-  // glm::mat4 view = orbitCam.getViewMatrix();
-  glm::mat4 view = fpsCam.getViewMatrix();
+  glm::mat4 model = worldModel->getModelMatrix();
+  glm::mat4 view = orbitCam.getViewMatrix();
+  // glm::mat4 view = fpsCam.getViewMatrix();
   glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
 
   // Draw Grid
@@ -280,6 +290,21 @@ void render()
   glBindVertexArray(gridVAO);
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
   glBindVertexArray(0);
+
+  glUseProgram(worldProgram);
+  modelLoc = glGetUniformLocation(worldProgram, "model");
+  viewLoc = glGetUniformLocation(worldProgram, "view");
+  projLoc = glGetUniformLocation(worldProgram, "projection");
+
+  glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+  glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+  glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, worldModel->textureID);
+  glUniform1i(glGetUniformLocation(worldProgram, "texture_diffuse1"), 0);
+
+  worldModel->draw(worldProgram);
 }
 
 int main(int argc, char *argv[])
@@ -308,6 +333,12 @@ int main(int argc, char *argv[])
   if (!drawOriginDot())
   {
     cerr << "Failed to initialize OriginDot" << endl;
+    return -1;
+  }
+
+  if (!drawWorldModel())
+  {
+    cerr << "Failed to initialize WorldModel" << endl;
     return -1;
   }
 
@@ -340,9 +371,9 @@ int main(int argc, char *argv[])
           running = false;
         }
       }
-      // handleOrbitMouseMovement(evt);
-      // handleOrbitZoom(evt);
-      handleFPSMouseMovement(evt);
+      handleOrbitMouseMovement(evt);
+      handleOrbitZoom(evt);
+      // handleFPSMouseMovement(evt);
     }
 
     fpsCam.updatePhysics(deltaTime);

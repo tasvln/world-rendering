@@ -23,8 +23,8 @@ namespace nsi
     };
 
     virtual ~Model() = default;
-    virtual void draw() = 0;
-    virtual void update(float deltaTime) = 0;
+    virtual void draw(GLuint shader) = 0;
+    // virtual void update(float deltaTime) = 0;
 
     // getters
     std::string getFilePath() { return filePath; };
@@ -34,9 +34,9 @@ namespace nsi
 
     // setters
     void setFilePath(std::string filePath) { this->filePath = filePath; };
-    void setPosition(glm::vec3 position) { position = position; };
-    void setRotation(glm::vec3 rotation) { rotation = rotation; };
-    void setScale(glm::vec3 scale) { scale = scale; };
+    void setPosition(glm::vec3 position) { this->position = position; }
+    void setRotation(glm::vec3 rotation) { this->rotation = rotation; }
+    void setScale(glm::vec3 scale) { this->scale = scale; }
 
     glm::mat4 getModelMatrix() const
     {
