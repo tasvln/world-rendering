@@ -16,6 +16,9 @@ desktop.ini
 *.iml
 out/
 
+#files
+ext/
+
 # Generated binaries
 *.o
 *.a

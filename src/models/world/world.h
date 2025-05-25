@@ -3,11 +3,11 @@
 
 #include <glm/glm.hpp>
 
-#include "../model/model.h"
+#include "../../assimpModel/AssimpModel.h"
 
 namespace nsi
 {
-  class World : public Model
+  class World : public AssimpModel
   {
   public:
     World(const std::string &filePath) : Model(filePath)
