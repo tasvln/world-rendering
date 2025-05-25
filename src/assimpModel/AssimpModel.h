@@ -19,7 +19,11 @@ namespace nsi
   class AssimpModel : public Model
   {
   public:
-    AssimpModel(const string &filePath, glm::vec3 position = glm::vec3(0.0f), glm::vec3 rotation = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f)) : Model(filePath, position, rotation, scale) {};
+    AssimpModel(const string &filePath, glm::vec3 position = glm::vec3(0.0f), glm::vec3 rotation = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f)) : Model(filePath, position, rotation, scale)
+    {
+      loadModel(filePath);
+    };
+
     ~AssimpModel() override = default;
 
     void draw(Shader &shader) override
@@ -36,7 +40,7 @@ namespace nsi
     std::string directory;
 
     // for sRGB monitors
-    bool gammaCorrection;
+    // bool gammaCorrection;
 
     void loadModel(const std::string &path)
     {
