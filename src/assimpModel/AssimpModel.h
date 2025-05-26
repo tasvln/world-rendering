@@ -25,7 +25,7 @@ namespace nsi
 
     ~AssimpModel() override = default;
 
-    void draw(GLuint shader) override
+    void draw(Shader &shader) override
     {
       for (Mesh &mesh : meshes)
       {

@@ -23,7 +23,7 @@ namespace nsi
     };
 
     virtual ~Model() = default;
-    virtual void draw(GLuint shader) = 0;
+    virtual void draw(Shader &shader) = 0;
     // virtual void update(float deltaTime) = 0;
 
     // getters

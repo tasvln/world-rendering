@@ -12,14 +12,6 @@ void close()
     glDeleteBuffers(1, &gridVBO);
   if (gridVAO)
     glDeleteVertexArrays(1, &gridVAO);
-  if (dotVBO)
-    glDeleteBuffers(1, &dotVBO);
-  if (dotVAO)
-    glDeleteVertexArrays(1, &dotVAO);
-  if (gridShaderProgram)
-    glDeleteProgram(gridShaderProgram);
-  if (originDotShaderProgram)
-    glDeleteProgram(originDotShaderProgram);
   if (context)
     SDL_GL_DestroyContext(context);
   if (window)
@@ -149,10 +141,9 @@ GLuint loadShader(const char *vertexPath, const char *fragPath)
   return shaderProgram;
 }
 
-bool initGL()
+bool initGrid()
 {
-  gridShaderProgram = loadShader("src/shaders/infiniteGrid/vertex.glsl", "src/shaders/infiniteGrid/frag.glsl");
-
+  gridShaderProgram = Shader("src/shaders/infiniteGrid/vertex.glsl", "src/shaders/infiniteGrid/frag.glsl");
   glGenVertexArrays(1, &gridVAO);
   glGenBuffers(1, &gridVBO);
   glGenBuffers(1, &gridEBO);
@@ -176,34 +167,16 @@ bool initGL()
   return true;
 }
 
-bool drawOriginDot()
-{
-  originDotShaderProgram = loadShader("src/shaders/centerAnchor/vertex.glsl", "src/shaders/centerAnchor/frag.glsl");
-
-  float dotVertices[] = {
-      0.0f, 0.0f, 0.0f};
-
-  glGenVertexArrays(1, &dotVAO);
-  glGenBuffers(1, &dotVBO);
-
-  glBindVertexArray(dotVAO);
-
-  glBindBuffer(GL_ARRAY_BUFFER, dotVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(dotVertices), dotVertices, GL_STATIC_DRAW);
-
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-  glEnableVertexAttribArray(0);
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-
-  return true;
-}
-
 bool drawWorldModel()
 {
-  worldProgram = loadShader("src/shaders/worldModel/vertex.glsl", "src/shaders/worldModel/frag.glsl");
+  worldProgram = Shader("src/shaders/worldModel/vertex.glsl", "src/shaders/worldModel/frag.glsl");
   worldModel = new nsi::World("ext/models/mountain1/mesh_range01_05K_OBJ.obj", glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
+
+  if (worldModel == nullptr)
+  {
+    cerr << "Failed to create world model" << endl;
+    return false;
+  }
 
   return true;
 }
@@ -277,32 +250,24 @@ void render()
   glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
 
   // Draw Grid
-  glUseProgram(gridShaderProgram);
-  GLuint modelLoc = glGetUniformLocation(gridShaderProgram, "model");
-  GLuint viewLoc = glGetUniformLocation(gridShaderProgram, "view");
-  GLuint projLoc = glGetUniformLocation(gridShaderProgram, "projection");
+  gridShaderProgram.use();
+  GLuint modelLoc = glGetUniformLocation(gridShaderProgram.ID, "model");
+  GLuint viewLoc = glGetUniformLocation(gridShaderProgram.ID, "view");
+  GLuint projLoc = glGetUniformLocation(gridShaderProgram.ID, "projection");
 
   glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
   glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
   glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-  glUniform1f(glGetUniformLocation(gridShaderProgram, "spacing"), 10.0f);
+  glUniform1f(glGetUniformLocation(gridShaderProgram.ID, "spacing"), 10.0f);
 
   glBindVertexArray(gridVAO);
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
   glBindVertexArray(0);
 
-  glUseProgram(worldProgram);
-  modelLoc = glGetUniformLocation(worldProgram, "model");
-  viewLoc = glGetUniformLocation(worldProgram, "view");
-  projLoc = glGetUniformLocation(worldProgram, "projection");
-
-  glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-  glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-  glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, worldModel->textureID);
-  glUniform1i(glGetUniformLocation(worldProgram, "texture_diffuse1"), 0);
+  worldProgram.use();
+  modelLoc = glGetUniformLocation(worldProgram.ID, "model");
+  viewLoc = glGetUniformLocation(worldProgram.ID, "view");
+  projLoc = glGetUniformLocation(worldProgram.ID, "projection");
 
   worldModel->draw(worldProgram);
 }
@@ -324,15 +289,9 @@ int main(int argc, char *argv[])
     return -1;
   }
 
-  if (!initGL())
+  if (!initGrid())
   {
     cerr << "Failed to initialize OpenGl" << endl;
-    return -1;
-  }
-
-  if (!drawOriginDot())
-  {
-    cerr << "Failed to initialize OriginDot" << endl;
     return -1;
   }
 

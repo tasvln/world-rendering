@@ -43,7 +43,7 @@ namespace nsi
       glDeleteBuffers(1, &EBO);
     }
 
-    void draw(GLuint shader)
+    void draw(Shader &shader)
     {
       uint diffuseNr = 1;
       uint specularNr = 1;
@@ -75,13 +75,13 @@ namespace nsi
         }
 
         std::string uniformName = name + number;
-        glUniform1i(glGetUniformLocation(shader, uniformName.c_str()), i);
+        glUniform1i(glGetUniformLocation(shader.ID, uniformName.c_str()), i);
 
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
       }
 
       glBindVertexArray(VAO);
-      glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+      glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
       glBindVertexArray(0);
 
       // reset to default

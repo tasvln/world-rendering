@@ -13,8 +13,10 @@ namespace nsi
     World(const std::string &filePath) : AssimpModel(filePath) {};
     World(const std::string &filePath, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale) : AssimpModel(filePath, position, rotation, scale) {};
     ~World() override = default;
-    void draw(GLuint shader) override
+    void draw(Shader &shader) override
     {
+
+      printf("World Class: Draw()\n");
       AssimpModel::draw(shader);
     }
   };

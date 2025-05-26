@@ -8,6 +8,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <glshader/glshader.h>
+
 #include "src/camera/orbit.h"
 #include "src/camera/fps.h"
 #include "src/models/world/world.h"
@@ -32,7 +34,7 @@ static SDL_Renderer *renderer = NULL;
 static SDL_GLContext context;
 
 // Open GL vars
-GLuint gridShaderProgram, originDotShaderProgram;
+Shader gridShaderProgram;
 GLuint gridVAO, gridVBO, gridEBO;
 GLuint dotVAO, dotVBO;
 
@@ -46,7 +48,7 @@ OrbitCamera orbitCam(
 FPSCamera fpsCam(glm::vec3(0.0f, 1.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f), -90.0f, 0.0f);
 
 // Models
-GLuint worldProgram;
+Shader worldProgram;
 nsi::World *worldModel = nullptr;
 
 void close();
